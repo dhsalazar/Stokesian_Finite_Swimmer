@@ -45,7 +45,6 @@ CONTAINS
     COMPLEX(DP), DIMENSION(0:Nc-1, 0:N-1):: A1_hat, P_hat, g1_hat, g2_hat
 
     !COEFFICIENT FOR COMP. OF P_hat (fourier symbols)
-
     COMPLEX(DP) :: lap_coeff, p_rhs
     COMPLEX(DP) :: g1_rhs, g2_rhs
 
@@ -145,7 +144,6 @@ CONTAINS
              sum_out = sum_out + sum_in
 
           ENDDO
-
 
           U1(i,j) = alpha*hb*h**2*sum_out
        ENDDO
@@ -299,7 +297,6 @@ CONTAINS
              sum_out = sum_out + sum_in
 
           ENDDO
-
 
           T1(i,j) = alpha*hb*h**2*sum_out
        ENDDO
@@ -592,10 +589,10 @@ CONTAINS
     g1 = g1/REAL(N**2)
     g2 = g2/REAL(N**2)
 
+
     ! INTERPOLATE THE RESULT FROM THE FLUID SOLVE
     DO s = 0, Nb
-
-       ! 1 - FOR EACH S, COMPUTE THE EULER INDEX CLOSEST TO BDRY
+       ! 1 - FOR EACH S, COMPUTE THE EULERIAN INDEX CLOSEST TO BDRY
        i_close = INT( (bdry0(s) - x0)/h    )
        j_close = INT( (bdry0(s+Nb+1) - y0)/h )
 
@@ -710,7 +707,6 @@ CONTAINS
 
 
        initial = approx
-!       print*, "count ", count, "r = ", r
        IF(R < 10.0**(-10)) EXIT
 
        IF(count > max_count)THEN
@@ -727,7 +723,7 @@ CONTAINS
 
 
 
-  FUNCTION C(k,t)
+  FUNCTION C(k,t) !CURVATURE FUNCTION
     REAL(DP) :: C
     REAL(DP) :: t,x
     INTEGER(DP) :: k
@@ -1302,14 +1298,6 @@ CONTAINS
           xr2 = bdry(r2)
        ENDIF
 
-       !THIS IS THE OLD WAY OF DOING IT
-!!$       LX_k   = xr1     -2*bdry(k) +  xl1       ;   LY_k   = bdry(r1 + Nb) -2*bdry(k  + Nb) + bdry(l1 + Nb)
-!!$       LX_kp1 = xr2     -2*xr1     + bdry(k)    ;   LY_kp1 = bdry(r2 + Nb) -2*bdry(r1 + Nb) + bdry(k + Nb) 
-!!$       LX_km1 = bdry(k) -2*xl1     + xl2        ;   LY_km1 = bdry(k  + Nb) -2*bdry(l1 + Nb) + bdry(l2 + Nb)
-!!$       ! DIFFERENCES IN X       ;   DIFFERENCES IN Y                            ;    SUM SQUARED
-!!$       dX_k   = xr1 - xl1       ;   dY_k   = bdry(r1 + Nb) - bdry(l1 + Nb)      ;    sum_k   = dX_k**2 + dY_k**2
-!!$       dX_kp1 = xr2 - bdry(k)   ;   dY_kp1 = bdry(r2 + Nb) - bdry(k + Nb)       ;    sum_kp1 = dX_kp1**2 + dY_kp1**2
-!!$       dX_km1 = bdry(k) - xl2   ;   dY_km1 = bdry(k  + Nb) - bdry(l2 + Nb)      ;    sum_km1 = dX_km1**2 + dY_km1**2
 
        ! DIFFERENCES IN X       ;   DIFFERENCES IN Y                            ;    SUM SQUARED
        dX_k   = xr1 - xl1       ;   dY_k   = bdry(r1 + Nb+1) - bdry(l1 + Nb+1)  ;    sum_k   = dX_k**2 + dY_k**2
@@ -2161,7 +2149,8 @@ CONTAINS
     y0_initial = sin(temp_theta)
   ENDFUNCTION y0_initial
 
-  FUNCTION bi_int(i,j,p1,p2,A)
+  FUNCTION bi_int(i,j,p1,p2,A) 
+    !bilinear interpolation
     REAL(DP) :: bi_int,p1,p2
     INTEGER(DP) :: i,j
     REAL(DP), DIMENSION(0:N-1, 0:N-1) :: A
